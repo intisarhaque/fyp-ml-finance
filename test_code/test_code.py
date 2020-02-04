@@ -25,3 +25,9 @@ result = np.loadtxt('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv', s
 
 print(result[0]['high'])
 print(date[:-9])
+
+#https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
+#https://cheat.readthedocs.io/en/latest/python/timezones.html
+#https://www.youtube.com/watch?v=zY02utxcauo
+#https://jakevdp.github.io/PythonDataScienceHandbook/03.11-working-with-time-series.html
+#https://stackoverflow.com/questions/20387359/regex-to-delete-whitespace-in-csv-file-with-quotes-to-separate-text
