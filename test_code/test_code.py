@@ -26,7 +26,7 @@ dt = np.dtype( [
     
 
 df = pd.read_csv('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
-df['Local time'] = df['State'].str.Remove(22, -1)
+df['Local time'] = df['Local time'].str.Substring(22, -1)
 
 
 result = np.loadtxt('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv', skiprows=1, delimiter = ',', dtype=dt ) 
