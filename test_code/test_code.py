@@ -17,7 +17,7 @@ from datetime import datetime
 
 
 dt = np.dtype( [
-    ('time', object), 
+    ('datetime', object), 
     ('open', float), 
     ('high', float),
     ('low', float),
@@ -25,18 +25,22 @@ dt = np.dtype( [
     ('volume', float)])
     
 
-df = pd.read_csv('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
-df['Local time'] = df['Local time'].str.Substring(22, -1)
+# df = pd.read_csv('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
+# df['Local time'] = df['Local time'].str.Substring(22, -1)
 
 
 result = np.loadtxt('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv', skiprows=1, delimiter = ',', dtype=dt ) 
 print(result[12]['open'])
 
 for i in result:
-    date = i['time']
+    date = i['datetime']
     date = date[0:-13]
     date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
-    # print(date.time())
+    i['datetime'] = date
+    print(i['datetime'].time())
+
+
+    
     
 # print(result[0]['high'])
 # print(date.time())
