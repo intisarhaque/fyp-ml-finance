@@ -10,10 +10,48 @@ from math import sqrt
 from dateutil import parser
 from datetime import datetime
 
+METRICRESULTS = 3
+
 
 # date = "02.01.2018 14:30:00.000 GMT-0000"
 # date = date[0:-13]
 # date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
+
+# v = open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
+# w = open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv', 'w')
+# r = csv.reader(v)
+# all = []
+# row0 = next(r)
+# for item in r:
+    # for i in range(0,METRICRESULTS):
+        # item.append("0")
+    # item.append("0")
+    # all.append(row)
+    print(item)
+
+v = open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
+r = csv.reader(v)
+row0 = next(r)
+print(row0)
+for item in r:
+    for i in range(0,METRICRESULTS):
+        item.append("0")
+    print(item)
+
+# with open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv','r') as csvinput:
+    # with open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv', 'w') as csvoutput:
+        # writer = csv.writer(csvoutput)
+        # v = open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
+        # r = csv.reader(v)
+        # all = []
+        # row0 = next(r)
+        # all.append(row)
+
+        # for row in r:
+            # item.append("0")
+            # all.append(row)
+
+        # writer.writerows(all)
 
 
 dt = np.dtype( [
@@ -37,7 +75,7 @@ for i in result:
     date = date[0:-13]
     date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
     i['datetime'] = date
-    print(i['datetime'].time())
+    #print(i['datetime'].time())
 
 
     
