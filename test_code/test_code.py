@@ -10,7 +10,61 @@ from math import sqrt
 from dateutil import parser
 from datetime import datetime
 
-METRICRESULTS = 3
+METRICRESULTS = 2
+
+
+
+v = open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
+r = csv.reader(v)
+row0 = next(r)
+print(row0)
+all = []
+for item in r:
+    # for i in range(0,METRICRESULTS):
+        # item.append("0")
+    item.append("candlestick")
+    item.append("0")
+    all.append(item)
+
+        
+with open('output.csv', 'w') as csvoutput:
+     writer = csv.writer(csvoutput, lineterminator='\n')
+     writer.writerows(all)
+
+
+dt = np.dtype( [
+    ('datetime', object), 
+    ('open', float), 
+    ('high', float),
+    ('low', float),
+    ('close', float),
+    ('volume', float),
+    ('candlestick', object),
+    ('score', int)])   
+result = np.loadtxt('output.csv', skiprows=1, delimiter = ',', dtype=dt ) 
+ 
+all = []
+for i in result:
+    date = i['datetime']
+    date = date[0:-13]
+    date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
+    i['datetime'] = date
+    #print(i['datetime'].time())
+    all.append(i)
+   
+with open('output.csv', 'w') as csvoutput:
+    writer = csv.writer(csvoutput, lineterminator='\n')
+    writer.writerows(all)
+    
+xaxis = result['datetime']
+yaxismu = result['close']
+plt.figure(0)
+plt.plot(xaxis, yaxismu)
+plt.xlabel('Time')
+plt.ylabel('Close')
+plt.title('Mu against Frequency to determine device stability')
+plt.show()
+
 
 
 # date = "02.01.2018 14:30:00.000 GMT-0000"
@@ -27,57 +81,7 @@ METRICRESULTS = 3
         # item.append("0")
     # item.append("0")
     # all.append(row)
-    print(item)
-
-v = open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
-r = csv.reader(v)
-row0 = next(r)
-print(row0)
-for item in r:
-    for i in range(0,METRICRESULTS):
-        item.append("0")
-    print(item)
-
-# with open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv','r') as csvinput:
-    # with open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv', 'w') as csvoutput:
-        # writer = csv.writer(csvoutput)
-        # v = open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
-        # r = csv.reader(v)
-        # all = []
-        # row0 = next(r)
-        # all.append(row)
-
-        # for row in r:
-            # item.append("0")
-            # all.append(row)
-
-        # writer.writerows(all)
-
-
-dt = np.dtype( [
-    ('datetime', object), 
-    ('open', float), 
-    ('high', float),
-    ('low', float),
-    ('close', float),
-    ('volume', float)])
-    
-
-# df = pd.read_csv('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
-# df['Local time'] = df['Local time'].str.Substring(22, -1)
-
-
-result = np.loadtxt('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv', skiprows=1, delimiter = ',', dtype=dt ) 
-print(result[12]['open'])
-
-for i in result:
-    date = i['datetime']
-    date = date[0:-13]
-    date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
-    i['datetime'] = date
-    #print(i['datetime'].time())
-
-
+    #print(item)
     
     
 # print(result[0]['high'])
@@ -87,17 +91,6 @@ for i in result:
 
 
 
-
-
-# xaxis = result['time']
-# yaxismu = result['close']
-# plt.figure(0)
-# plt.plot(xaxis, yaxismu)
-# plt.xlabel('Time')
-# plt.ylabel('Close')
-# plt.axhline(y=1, color='r', linestyle='-') # Plotting the constant Y at mu=1.
-# plt.title('Mu against Frequency to determine device stability')
-# plt.show()
 
 
 
