@@ -10,16 +10,37 @@ from math import sqrt
 from dateutil import parser
 from datetime import datetime
 import glob
-
-txtfiles = []
-for file in glob.glob("*.csv"):
-    txtfiles.append(file)
-print(txtfiles)
 METRICRESULTS = 2
 
 
+txtfiles = []
+for file in glob.glob("H:/Documents/fyp-ml-finance/dataset/tempdatasetraw/*"):
+    txtfiles.append(file)
 
-v = open('AMD.USUSD_Candlestick_1_s_BID_02.01.2018-02.01.2018.csv')
+listDataset = []
+class Dataset:
+  def __init__(self, csvRaw):
+    self.csvRaw = csvRaw
+    self.csvProcessed0 = csvRaw + ".Processed0"
+
+  def myfunc(a):
+    print("raw= " + a.csvRaw + "\nprocessed= " + a.csvProcessed0)
+
+
+
+for i in txtfiles:
+    D = Dataset(i)
+    D.myfunc()
+    print("\n")
+    
+# p1 = Person("John", 36)
+# p1.myfunc()
+
+
+ 
+
+
+v = open(txtfiles[1])
 r = csv.reader(v)
 row0 = next(r)
 print(row0)
@@ -58,6 +79,9 @@ for i in result:
 with open('output.csv', 'w') as csvoutput:
     writer = csv.writer(csvoutput, lineterminator='\n')
     writer.writerows(all)
+    
+# for i in all:
+    # print(i)
     
 # xaxis = result['datetime']
 # yaxismu = result['close']
