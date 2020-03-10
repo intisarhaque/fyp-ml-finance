@@ -21,17 +21,22 @@ listDataset = []
 class Dataset:
   def __init__(self, csvRaw):
     self.csvRaw = csvRaw
-    self.csvProcessed0 = csvRaw + ".Processed0"
+    self.csvProcessed0 = csvRaw[0:-4] + ".Processed0.csv"
 
   def myfunc(a):
     print("raw= " + a.csvRaw + "\nprocessed= " + a.csvProcessed0)
-
+    
+  def getProcessed0(a):
+    x = ""
+    x += a.csvProcessed0
+    return x
 
 
 for i in txtfiles:
     D = Dataset(i)
     D.myfunc()
     print("\n")
+    listDataset.append(D)
     
 # p1 = Person("John", 36)
 # p1.myfunc()
@@ -40,45 +45,47 @@ for i in txtfiles:
  
 
 
-v = open(txtfiles[1])
+v = open(listDataset[0].csvRaw)
 r = csv.reader(v)
 row0 = next(r)
 print(row0)
 all = []
 for item in r:
-    # for i in range(0,METRICRESULTS):
-        # item.append("0")
     item.append("candlestick")
     item.append("0")
-    all.append(item)        
-with open('output.csv', 'w') as csvoutput:
+    all.append(item)       
+
+file0 = listDataset[0].getProcessed0()
+print(file0)
+
+with open(file0, 'w') as csvoutput:
      writer = csv.writer(csvoutput, lineterminator='\n')
      writer.writerows(all)
 
 
-dt = np.dtype( [
-    ('datetime', object), 
-    ('open', float), 
-    ('high', float),
-    ('low', float),
-    ('close', float),
-    ('volume', float),
-    ('candlestick', object),
-    ('score', int)])   
-result = np.loadtxt('output.csv', skiprows=1, delimiter = ',', dtype=dt ) 
+# dt = np.dtype( [
+    # ('datetime', object), 
+    # ('open', float), 
+    # ('high', float),
+    # ('low', float),
+    # ('close', float),
+    # ('volume', float),
+    # ('candlestick', object),
+    # ('score', int)])   
+# result = np.loadtxt('output.csv', skiprows=1, delimiter = ',', dtype=dt ) 
  
-all = []
-for i in result:
-    date = i['datetime']
-    date = date[0:-13]
-    date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
-    i['datetime'] = date
+# all = []
+# for i in result:
+    # date = i['datetime']
+    # date = date[0:-13]
+    # date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
+    # i['datetime'] = date
     #print(i['datetime'].time())
-    all.append(i)
+    # all.append(i)
    
-with open('output.csv', 'w') as csvoutput:
-    writer = csv.writer(csvoutput, lineterminator='\n')
-    writer.writerows(all)
+# with open('output.csv', 'w') as csvoutput:
+    # writer = csv.writer(csvoutput, lineterminator='\n')
+    # writer.writerows(all)
     
 # for i in all:
     # print(i)
