@@ -18,7 +18,7 @@ class Dataset:
     self.csvRaw = csvRaw
     self.csvProcessed0 = csvRaw[0:-4] + ".Processed0.csv" #file with 2 columns
     self.csvProcessed1 = csvRaw[0:-4] + ".Processed1.csv" #file with correct data
-    self.csvProcessed2 = csvRaw[0:-4] + ".Processed1.csv" #file with candlestick
+    self.csvProcessed2 = csvRaw[0:-4] + ".Processed2.csv" #file with candlestick
 
 
   def myfunc(a):
@@ -32,6 +32,11 @@ class Dataset:
   def getProcessed1(a):
     x = ""
     x += a.csvProcessed1
+    return x
+
+  def getProcessed2(a):
+    x = ""
+    x += a.csvProcessed2
     return x
 #*********************************
 
@@ -111,9 +116,6 @@ for i in result:
     date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
     i['datetime'] = date
     #print(i['datetime'].time())
-    timeVal = Candle(i['open'], i['high'], i['low'], i['close'])
-    candleVal = timeVal.getCandleClass()
-    i['candlestick'] = candleVal
     all.append(i)
 
 file1 = listDataset[0].getProcessed1()
@@ -124,12 +126,19 @@ with open(file1, 'w') as csvoutput:
 
 
 
+all = []
+result = np.loadtxt(listDataset[0].getProcessed1(), skiprows=1, delimiter = ',', dtype=dt )
+for i in result:
+    timeVal = Candle(i['open'], i['high'], i['low'], i['close'])
+    candleVal = timeVal.getCandleClass()
+    i['candlestick'] = candleVal
+    all.append(i)
 
+file2 = listDataset[0].getProcessed2()
+with open(file2, 'w') as csvoutput:
+    writer = csv.writer(csvoutput, lineterminator='\n')
+    writer.writerows(all)
 
-
-
-# for i in all:
-#     print(i)
 
 # xaxis = result['datetime']
 # yaxismu = result['close']
