@@ -18,7 +18,7 @@ class Dataset:
     self.csvRaw = csvRaw
     self.csvProcessed0 = csvRaw[0:-4] + ".Processed0.csv" #file with 2 columns
     self.csvProcessed1 = csvRaw[0:-4] + ".Processed1.csv" #file with correct data
-    self.csvProcessed2 = csvRaw[0:-4] + ".Processed2.csv" #file with candlestick
+    self.csvProcessed2 = csvRaw[0:-4] + ".Processed2.csv" #file with candlestickcolour
 
 
   def myfunc(a):
@@ -48,17 +48,38 @@ class Candle:
         self.high = high
         self.low = low
         self.close = close
+        self.colour = "neither"
+        self.candletype = "none"
 
-    def getCandleClass(a):
-        if a.open > a.close:
-            return "green"
-        elif a.open < a.close:
-            return "red"
-        else:
-            return "neither"
-
+    def getColour(a):
+        return a.colour 
         #green is open>close
         #red is open<close
+        
+    def setColour(a):
+        if a.open > a.close:
+            a.colour = "white"
+        elif a.open < a.close:
+            a.colour = "black"
+        else:
+            a.colour = "neither"
+            
+    def setCandleType(a):        
+        if (a.high == a.close) & (a.open == a.low):
+            if a.getColour() == "white":
+                a.candletype = "whiteMaruboxu"
+            if a.getColour() == "black":
+                a.candletype = "blackMaruboxu"
+
+  # def getCandleType(a):
+        # return a.candletype
+            
+    # def setCandleType(a):        
+        # if (a.high == a.close) & (a.open == a.low):
+            # if a.getColour() == "white":
+                # a.candletype = "whiteMaruboxu"
+            # if a.getColour() == "black":
+                # a.candletype = "blackMaruboxu" 
 #*********************************
 
 
@@ -66,9 +87,11 @@ class Candle:
 
 #*********************************
 txtfiles = []
-for file in glob.glob("C:\\Users\\arsen\\Documents\\fyp-ml-finance\\dataset\\tempdatasetraw/*"):
+for file in glob.glob("H:/Documents/fyp-ml-finance/dataset/tempdatasetraw/*"):
     txtfiles.append(file)
 #for file in glob.glob("H:/Documents/fyp-ml-finance/dataset/tempdatasetraw/*"):
+#for file in glob.glob("C:\\Users\\arsen\\Documents\\fyp-ml-finance\\dataset\\tempdatasetraw/*"):
+
 
 
 listDataset = []
@@ -130,8 +153,9 @@ all = []
 result = np.loadtxt(listDataset[0].getProcessed1(), skiprows=1, delimiter = ',', dtype=dt )
 for i in result:
     timeVal = Candle(i['open'], i['high'], i['low'], i['close'])
-    candleVal = timeVal.getCandleClass()
-    i['candlestick'] = candleVal
+    timeVal.setColour()
+    colourVal = timeVal.getColour()
+    i['candlestick'] = colourVal
     all.append(i)
 
 file2 = listDataset[0].getProcessed2()
