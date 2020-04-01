@@ -18,7 +18,8 @@ class Dataset:
     self.csvRaw = csvRaw
     self.csvProcessed0 = csvRaw[0:-4] + ".Processed0.csv" #file with 2 columns
     self.csvProcessed1 = csvRaw[0:-4] + ".Processed1.csv" #file with correct data
-    self.csvProcessed2 = csvRaw[0:-4] + ".Processed2.csv" #file with candlestickcolour
+    self.csvProcessed2 = csvRaw[0:-4] + ".Processed2.csv" #file with candletype/colour
+    self.csvProcessed3 = csvRaw[0:-4] + ".Processed3.csv" #file with movingaverage
 
 
   def myfunc(a):
@@ -38,6 +39,11 @@ class Dataset:
     x = ""
     x += a.csvProcessed2
     return x
+
+  def getProcessed3(a):
+    x = ""
+    x += a.csvProcessed3
+    return x
 #*********************************
 
 
@@ -50,77 +56,94 @@ class Candle:
         self.close = close
         self.colour = "neither"
         self.candletype = "none"
+        self.fivedayaverage = 0
 
     def getColour(a):
-        return a.colour 
+        return a.colour
         #green is open>close
         #red is open<close
-        
+
     def setColour(a):
         if a.open > a.close:
-            a.colour = "white"
-        elif a.open < a.close:
             a.colour = "black"
+        elif a.open < a.close:
+            a.colour = "white"
         else:
             a.colour = "neither"
-            
-    def setCandleType(a):        
-        if (a.high == a.close) & (a.open == a.low):
-            if a.getColour() == "white":
-                a.candletype = "whiteMaruboxu"
-            if a.getColour() == "black":
-                a.candletype = "blackMaruboxu"
 
-  # def getCandleType(a):
-        # return a.candletype
-            
-    # def setCandleType(a):        
-        # if (a.high == a.close) & (a.open == a.low):
-            # if a.getColour() == "white":
-                # a.candletype = "whiteMaruboxu"
-            # if a.getColour() == "black":
-                # a.candletype = "blackMaruboxu" 
+    def getCandleType(a):
+        return a.candletype
+
+    def setCandleType(a):
+        if (a.getColour() == "white") & (a.high == a.close) & (a.open == a.low):
+            a.candletype = "whiteMaruboxu"
+        if (a.getColour() == "black") & (a.high == a.open) & (a.close == a.low):
+            a.candletype = "blackMaruboxu"
+        if (a.open == a.close):
+            a.candletype = "doji"
+
+    def getCandleFiveDayAve(a):
+        return a.fivedayaverage
+
+    def setCandleFiveDayAve(a, item):
+        a.fivedayaverage = item
 #*********************************
 
+#*********************************
+class Queue(object):
+    def __init__(self):
+        self.items=[]
+        self.total = 0
+    def isEmpty(self):
+        return self.items == []
+    def enqueue(self, item):
+        self.items.insert(0,item)
+        self.total += item
+    def dequeue(self):
+        item = self.items.pop()
+        self.total -=item
+        return item
+    def size(self):
+        return len(self.items)
+    def fivedayaverage(self):
+        return self.total/self.size()
+#*********************************
 
 
 
 #*********************************
 txtfiles = []
-for file in glob.glob("H:/Documents/fyp-ml-finance/dataset/tempdatasetraw/*"):
+for file in glob.glob("C:\\Users\\arsen\\Documents\\fyp-ml-finance\\dataset\\tempdatasetraw/*"):
     txtfiles.append(file)
 #for file in glob.glob("H:/Documents/fyp-ml-finance/dataset/tempdatasetraw/*"):
 #for file in glob.glob("C:\\Users\\arsen\\Documents\\fyp-ml-finance\\dataset\\tempdatasetraw/*"):
-
-
-
 listDataset = []
 for i in txtfiles:
     D = Dataset(i)
     #D.myfunc()
-    print("\n")
+    #print("\n")
     listDataset.append(D)
 #*********************************
 
-
+#*********************************
 v = open(listDataset[0].csvRaw)
 r = csv.reader(v)
 row0 = next(r)
 #print(row0)
 all = []
 for item in r:
-    item.append("candlestick")
-    item.append("0")
+    item.append("colour")
+    item.append("candletype")
+    item.append(0)#5daymovingaverage
     all.append(item)
 
 file0 = listDataset[0].getProcessed0()
-print("file0 is " + file0)
-
 with open(file0, 'w') as csvoutput:
      writer = csv.writer(csvoutput, lineterminator='\n')
      writer.writerows(all)
+#*********************************
 
-
+#*********************************
 dt = np.dtype( [
     ('datetime', object),
     ('open', float),
@@ -128,8 +151,9 @@ dt = np.dtype( [
     ('low', float),
     ('close', float),
     ('volume', float),
-    ('candlestick', object),
-    ('score', int)])
+    ('colour', object),
+    ('candletype', object),
+    ('fivedayaverage', float)])
 result = np.loadtxt(listDataset[0].getProcessed0(), skiprows=1, delimiter = ',', dtype=dt )
 
 all = []
@@ -145,23 +169,46 @@ file1 = listDataset[0].getProcessed1()
 with open(file1, 'w') as csvoutput:
     writer = csv.writer(csvoutput, lineterminator='\n')
     writer.writerows(all)
+#*********************************
 
-
-
-
+#*********************************
 all = []
 result = np.loadtxt(listDataset[0].getProcessed1(), skiprows=1, delimiter = ',', dtype=dt )
 for i in result:
     timeVal = Candle(i['open'], i['high'], i['low'], i['close'])
     timeVal.setColour()
     colourVal = timeVal.getColour()
-    i['candlestick'] = colourVal
+    i['colour'] = colourVal
+    timeVal.setCandleType()
+    candletypeVal = timeVal.getCandleType()
+    i['candletype'] = candletypeVal
     all.append(i)
 
 file2 = listDataset[0].getProcessed2()
 with open(file2, 'w') as csvoutput:
     writer = csv.writer(csvoutput, lineterminator='\n')
     writer.writerows(all)
+#*********************************
+
+#*********************************
+all = []
+result = np.loadtxt(listDataset[0].getProcessed2(), skiprows=1, delimiter = ',', dtype=dt )
+q = Queue()
+for i in result:
+    if q.size() < 5:
+        q.enqueue(i['close'])
+    else:
+        q.enqueue(i['close'])
+        q.dequeue()
+    average = q.fivedayaverage()
+    # print(average)
+    i['fivedayaverage'] = average
+    all.append(i)
+file3 = listDataset[0].getProcessed3()
+with open(file3, 'w') as csvoutput:
+    writer = csv.writer(csvoutput, lineterminator='\n')
+    writer.writerows(all)
+#*********************************
 
 
 # xaxis = result['datetime']
