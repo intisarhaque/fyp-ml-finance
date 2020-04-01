@@ -57,6 +57,7 @@ class Candle:
         self.colour = "neither"
         self.candletype = "none"
         self.fivedayaverage = 0
+        self.rsi = 50
 
     def getColour(a):
         return a.colour
@@ -87,6 +88,12 @@ class Candle:
 
     def setCandleFiveDayAve(a, item):
         a.fivedayaverage = item
+
+    def getrsi(a):
+        return a.rsi
+
+    def setrsi(a, item):
+        a.rsi = item
 #*********************************
 
 #*********************************
@@ -107,6 +114,30 @@ class Queue(object):
         return len(self.items)
     def fivedayaverage(self):
         return self.total/self.size()
+    def fivedayrsi(self):
+        #mustreview
+        diffcollection = []
+        for i in range(0,5):
+            x = self.items.pop()
+            diffcollection.append(x)
+            self.items.insert(0,x)
+        gain = 0
+        loss = 0
+        for i in diffcollection:
+            if i>0:
+                gain +=i
+            else:
+                loss += (i*-1)
+        gain = gain/5
+        loss = loss/5
+        rs = gain/loss
+        rsi = 100 -(100/(1+rs))
+        return rsi
+
+
+
+
+
 #*********************************
 
 
@@ -135,6 +166,7 @@ for item in r:
     item.append("colour")
     item.append("candletype")
     item.append(0)#5daymovingaverage
+    item.append(50)#rsi
     all.append(item)
 
 file0 = listDataset[0].getProcessed0()
@@ -153,7 +185,8 @@ dt = np.dtype( [
     ('volume', float),
     ('colour', object),
     ('candletype', object),
-    ('fivedayaverage', float)])
+    ('fivedayaverage', float),
+    ('fivedayrsi', float)])
 result = np.loadtxt(listDataset[0].getProcessed0(), skiprows=1, delimiter = ',', dtype=dt )
 
 all = []
@@ -193,17 +226,38 @@ with open(file2, 'w') as csvoutput:
 #*********************************
 all = []
 result = np.loadtxt(listDataset[0].getProcessed2(), skiprows=1, delimiter = ',', dtype=dt )
-q = Queue()
+q5 = Queue()
+q5rsi = Queue()
+q5rsi.enqueue(0)
+q5rsi.enqueue(0)
+q5rsi.enqueue(0)
+q5rsi.enqueue(0)
+q5rsi.enqueue(0)
+closeprev = 0
 for i in result:
-    if q.size() < 5:
-        q.enqueue(i['close'])
+    diff = i['close']-closeprev
+    closeprev =  i['close']
+    q5rsi.enqueue(diff)
+    q5rsi.dequeue()
+    if q5.size() < 5:
+        q5.enqueue(i['close'])
     else:
-        q.enqueue(i['close'])
-        q.dequeue()
-    average = q.fivedayaverage()
-    # print(average)
+        #can possibly be done with just a running total as opposed to a queue.
+        #with more moving indicators, a queue can be more useful
+        q5.enqueue(i['close'])
+        q5.dequeue()
+
+
+    average = q5.fivedayaverage()
     i['fivedayaverage'] = average
+
+    rsi = q5rsi.fivedayrsi()
+    i['fivedayrsi'] = rsi
+
+    #print(rsi)
     all.append(i)
+
+
 file3 = listDataset[0].getProcessed3()
 with open(file3, 'w') as csvoutput:
     writer = csv.writer(csvoutput, lineterminator='\n')
@@ -247,3 +301,4 @@ with open(file3, 'w') as csvoutput:
 #https://medium.com/analytics-vidhya/recognizing-over-50-candlestick-patterns-with-python-4f02a1822cb5
 #https://github.com/mrjbq7/ta-lib/tree/master/talib
 #https://fxgears.com/index.php?threads/recommended-books-for-algo-trading-in-2020.1243/
+#https://www.youtube.com/watch?v=8ILZZpIJSYs
