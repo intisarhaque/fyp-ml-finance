@@ -14,36 +14,42 @@ METRICRESULTS = 2
 
 #*********************************
 class Dataset:
-  def __init__(self, csvRaw):
-    self.csvRaw = csvRaw
-    self.csvProcessed0 = csvRaw[0:-4] + ".Processed0.csv" #file with 2 columns
-    self.csvProcessed1 = csvRaw[0:-4] + ".Processed1.csv" #file with correct data
-    self.csvProcessed2 = csvRaw[0:-4] + ".Processed2.csv" #file with candletype/colour
-    self.csvProcessed3 = csvRaw[0:-4] + ".Processed3.csv" #file with movingaverage
 
+    def __init__(self, csvRaw):
+        self.csvRaw = csvRaw
+        self.csvProcessed0 = csvRaw[0:-4] + ".Processed0.csv" #file with 2 columns
+        self.csvProcessed1 = csvRaw[0:-4] + ".Processed1.csv" #file with correct data
+        self.csvProcessed2 = csvRaw[0:-4] + ".Processed2.csv" #file with candletype/colour
+        self.csvProcessed3 = csvRaw[0:-4] + ".Processed3.csv" #file with movingaverage
+        self.csvProcessed4 = csvRaw[0:-4] + ".Processed4.csv" #file with quartile
 
-  def myfunc(a):
-    print("raw= " + a.csvRaw + "\nprocessed= " + a.csvProcessed0)
+    def myfunc(a):
+        print("raw= " + a.csvRaw + "\nprocessed= " + a.csvProcessed0)
 
-  def getProcessed0(a):
-    x = ""
-    x += a.csvProcessed0
-    return x
+    def getProcessed0(a):
+        x = ""
+        x += a.csvProcessed0
+        return x
 
-  def getProcessed1(a):
-    x = ""
-    x += a.csvProcessed1
-    return x
+    def getProcessed1(a):
+        x = ""
+        x += a.csvProcessed1
+        return x
 
-  def getProcessed2(a):
-    x = ""
-    x += a.csvProcessed2
-    return x
+    def getProcessed2(a):
+        x = ""
+        x += a.csvProcessed2
+        return x
 
-  def getProcessed3(a):
-    x = ""
-    x += a.csvProcessed3
-    return x
+    def getProcessed3(a):
+        x = ""
+        x += a.csvProcessed3
+        return x
+
+    def getProcessed4(a):
+        x = ""
+        x += a.csvProcessed4
+        return x
 #*********************************
 
 
@@ -58,6 +64,7 @@ class Candle:
         self.candletype = "none"
         self.fivedayaverage = 0
         self.rsi = 50
+        self.quartile = 50
 
     def getColour(a):
         return a.colour
@@ -167,6 +174,7 @@ for item in r:
     item.append("candletype")
     item.append(0)#5daymovingaverage
     item.append(50)#rsi
+    item.append(2)#quartile
     all.append(item)
 
 file0 = listDataset[0].getProcessed0()
@@ -186,7 +194,8 @@ dt = np.dtype( [
     ('colour', object),
     ('candletype', object),
     ('fivedayaverage', float),
-    ('fivedayrsi', float)])
+    ('fivedayrsi', float),
+    ('quartile', float)])
 result = np.loadtxt(listDataset[0].getProcessed0(), skiprows=1, delimiter = ',', dtype=dt )
 
 all = []
@@ -265,6 +274,43 @@ with open(file3, 'w') as csvoutput:
 #*********************************
 
 
+all = []
+result = np.loadtxt(listDataset[0].getProcessed3(), skiprows=1, delimiter = ',', dtype=dt )
+closingPriceList = []
+for i in result:
+    closingPriceList.append(i['close'])
+numberOfTicks = len(closingPriceList)
+
+closingPriceListSorted = sorted(closingPriceList)
+minClosePrice = closingPriceListSorted[0]
+maxClosePrice = closingPriceListSorted[numberOfTicks-1]
+
+lowerQuartileIndex = numberOfTicks/4
+medianIndex = numberOfTicks/2
+UpperQuartileIndex = 3*numberOfTicks/4
+
+lowerQuartileClose = closingPriceListSorted[lowerQuartileIndex]
+medianClose = closingPriceListSorted[medianIndex]
+upperQuartileClose = closingPriceListSorted[UpperQuartileIndex]
+
+for i in result:
+    if i['close'] <=lowerQuartileClose:
+        i['quartile'] = 1
+    elif (i['close'] >lowerQuartileClose) & (i['close'] <= medianClose):
+        i['quartile'] = 2
+    elif (i['close'] >medianClose) & (i['close'] <= upperQuartileClose):
+        i['quartile'] = 3
+    elif i['close'] >upperQuartileClose:
+        i['quartile'] = 4
+    else:
+        continue
+    all.append(i)
+
+
+file4 = listDataset[0].getProcessed4()
+with open(file4, 'w') as csvoutput:
+    writer = csv.writer(csvoutput, lineterminator='\n')
+    writer.writerows(all)
 # xaxis = result['datetime']
 # yaxismu = result['close']
 # plt.figure(0)
@@ -302,3 +348,12 @@ with open(file3, 'w') as csvoutput:
 #https://github.com/mrjbq7/ta-lib/tree/master/talib
 #https://fxgears.com/index.php?threads/recommended-books-for-algo-trading-in-2020.1243/
 #https://www.youtube.com/watch?v=8ILZZpIJSYs
+
+
+#timeseries
+#https://www.youtube.com/watch?v=e8Yw4alG16Q
+#https://www.youtube.com/watch?v=bn8rVBuIcFg
+#https://otexts.com/fpp2/graphics.html
+#file:///C:/Users/arsen/Documents/Y3S1/Project%20shit/papers/pdfslide.net_expert-system-for-predicting-stock-market-timing-using-a-candlestick-chart.pdf  expert system, predfined rules of candlestick, i want rules to change
+#file:///C:/Users/arsen/Documents/Y3S1/Project%20shit/papers/88ee95e16dac7a2e4d65aa095199bbc3439f.pdf
+#file:///C:/Users/arsen/Documents/Y3S1/Project%20shit/papers/Using_Machine_Learning_Techniques_to_Combine_Forec.pdf
