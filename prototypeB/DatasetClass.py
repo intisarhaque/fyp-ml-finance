@@ -18,6 +18,8 @@ PROC2DIR = "C:\\Users\\arsen\\Documents\\Y3S1\\Project shit\\fyp-ml-finance\\pro
 PROC3DIR = "C:\\Users\\arsen\\Documents\\Y3S1\\Project shit\\fyp-ml-finance\\prototypeB\\datasetProc3\\"
 PROC4DIR = "C:\\Users\\arsen\\Documents\\Y3S1\\Project shit\\fyp-ml-finance\\prototypeB\\datasetProc4\\"
 PROC5DIR = "C:\\Users\\arsen\\Documents\\Y3S1\\Project shit\\fyp-ml-finance\\prototypeB\\datasetProc5\\"
+FINALATTRIBUTEDIR = "C:\\Users\\arsen\\Documents\\Y3S1\\Project shit\\fyp-ml-finance\\prototypeB\\datasetProc5\\*"
+PATTERNDIR = "C:\\Users\\arsen\\Documents\\Y3S1\\Project shit\\fyp-ml-finance\\prototypeB\\datasetAttribute\\"
 
 
 DT = np.dtype( [
@@ -30,27 +32,53 @@ DT = np.dtype( [
     ('colour', object),
     ('candletype', object),
     ('5tickaverage', float),
-    ('100tickaverage', float),
-    ('200tickaverage', float),
-    ('450tickaverage', float),
-    ('1000tickaverage', float),
+    ('15tickaverage', float),
+    ('30tickaverage', float),
+    ('60tickaverage', float),
+    ('120tickaverage', float),
     ('fivedayrsi', float),#rename all day to tick
     ('twentydayrsi', float),
     ('fiftydayrsi', float),
+    ('fibonaccipercent', float),
     ('5tickaveragefuture', float),
-    ('100tickaveragefuture', float),
-    ('200tickaveragefuture', float),
-    ('450tickaveragefuture', float),
-    ('1000tickaveragefuture', float),
+    ('15tickaveragefuture', float),
+    ('30tickaveragefuture', float),
+    ('60tickaveragefuture', float),
+    ('120tickaveragefuture', float),
+    ('percentile', int),
+    ('quartile', int)])
+
+
+
+DT0 = np.dtype( [
+    ('datetime', object),
+    ('close', float),
+    ('5MAfuturepercent', float),
+    ('15MAfuturepercent', float),
+    ('30MAfuturepercent', float),
+    ('60MAfuturepercent', float),
+    ('120MAfuturepercent', float),
     ('percentile', int),
     ('quartile', int),
+    ('colour', object),
+    ('candletype', object),
+    ('5diffpercent', float),
+    ('15diffpercent', float),
+    ('30diffpercent', float),
+    ('60diffpercent', float),
+    ('120diffpercent', float),
+    ('fivedayrsi', float),#rename all day to tick
+    ('twentydayrsi', float),
+    ('fiftydayrsi', float),
     ('fibonaccipercent', float)])
+
 
 
 
 class Dataset:
     def __init__(self, csvDir):
         self.csvRaw = csvDir[-55:]
+        self.csvAttributeRaw = csvDir[-66:-15]
         self.csvDir = csvDir
         self.csvProcessed0 = PROC0DIR + self.csvRaw[0:-4] + ".processed0.csv" #file with all columbns
         self.csvProcessed1 = PROC1DIR + self.csvRaw[0:-4] + ".Processed1.csv" #file with correct data
@@ -58,6 +86,27 @@ class Dataset:
         self.csvProcessed3 = PROC3DIR + self.csvRaw[0:-4] + ".Processed3.csv" #file with movingaverage
         self.csvProcessed4 = PROC4DIR + self.csvRaw[0:-4] + ".Processed4.csv" #file with percentile
         self.csvProcessed5 = PROC5DIR + self.csvRaw[0:-4] + ".Processed5.csv" #file with fibonacci
+        self.csvPattern0 = PATTERNDIR + self.csvAttributeRaw + ".Pattern0.csv" #file with fibonacci
+        self.csvPrediction0 = PATTERNDIR + self.csvAttributeRaw + ".Prediction0.csv"
+
+    def getDir(a):
+        return a.csvDir
+
+    def getAttributeRaw(a):
+        return a.csvAttributeRaw
+
+    def getRaw(a):
+        return a.csvRaw
+
+    def getPattern0(a):
+        x = ""
+        x += a.csvPattern0
+        return x
+
+    def getPrediction0(a):
+        x = ""
+        x += a.csvPrediction0
+        return x
 
 
     def getProcessed0(a):

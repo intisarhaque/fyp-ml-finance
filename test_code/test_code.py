@@ -26,6 +26,9 @@ class Dataset:
     def myfunc(a):
         print("raw= " + a.csvRaw + "\nprocessed= " + a.csvProcessed0)
 
+    def getRaw(a):
+        return a.csvRaw
+
     def getProcessed0(a):
         x = ""
         x += a.csvProcessed0
@@ -230,10 +233,13 @@ for i in txtfiles:
     #D.myfunc()
     #print("\n")
     listDataset.append(D)
+
 """"""""""""#*********************************
 
+#for i in range(0,len(listDataset)):
+    #print(i, " ", listDataset[i].getRaw())
 
-
+print("boob ", listDataset[0].getRaw())
 """"""""""""#*********************************
 v = open(listDataset[0].csvRaw)
 r = csv.reader(v)
@@ -274,10 +280,14 @@ dt = np.dtype( [
     ('fiftydayrsi', float),
     ('percentile', int),
     ('quartile', int)])
-result = np.loadtxt(listDataset[0].getProcessed0(), skiprows=1, delimiter = ',', dtype=dt )
 
+result = np.loadtxt(listDataset[0].getProcessed0(), skiprows=1, delimiter = ',', dtype=dt )
 all = []
 for i in result:
+    if (i==result[-1]):
+        print("dmm", i)
+    if (i['volume'] == 0):
+        continue
     date = i['datetime']
     date = date[0:-13]
     date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
@@ -420,7 +430,7 @@ for i in result:
     else:
         continue
 
-    result[0]['close'] = 1000    
+    result[0]['close'] = 1000
     all.append(i)
 
 
